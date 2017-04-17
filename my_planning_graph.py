@@ -318,24 +318,24 @@ class PlanningGraph():
         # Get the current s level
         current_s_level_nodes = self.s_levels[level]
         # Check all actions.
-        for current_action in self.all_actions:
+        for one_action in self.all_actions:
             # 1. determine what actions to add and create those PgNode_a objects
-            current_action_pg_node_a = PgNode_a(current_action)
+            current_action_pg_node_a = PgNode_a(one_action)
             # Get the precondition S nodes.
-            set_of_pg_node_s = current_action_pg_node_a.prenodes
+            preconditions_of_pg_node_s = current_action_pg_node_a.prenodes
             # If all the precondition S nodes are in the current s_level,
             # then, we can say it can be added to the current a_level
-            if set_of_pg_node_s.issubset(current_s_level_nodes):
+            if preconditions_of_pg_node_s.issubset(current_s_level_nodes):
                 # Add into the current a_level.
                 self.a_levels[level].add(current_action_pg_node_a)
 
                 # 2. connect the nodes to the previous S literal level
-                # Check all S level nodes.
-                for one_s_level_node in current_s_level_nodes:
-                    # Add current A node into S level node as a child.
-                    one_s_level_node.children.add(current_action_pg_node_a)
-                    # Add S level node into current A node as a parent.
-                    current_action_pg_node_a.parents.add(one_s_level_node)
+                # From the definition, the preconditions
+                #     will become the parents of the A-level node.
+                current_action_pg_node_a.parents = preconditions_of_pg_node_s
+                # From the definition, the effects
+                #     will become the children of the A-level node.
+                current_action_pg_node_a.children = current_action_pg_node_a.effnodes
 
         # There is no return value.
 
